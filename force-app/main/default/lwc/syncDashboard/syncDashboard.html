@@ -1,0 +1,210 @@
+<template>
+  <lightning-card title="Multi-Org Sync Dashboard" icon-name="utility:sync">
+    <div class="slds-var-m-around_medium">
+      <!-- Sync Stats Section -->
+      <div class="slds-box slds-var-m-bottom_large">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_medium">Sync Health</h3>
+        <div class="slds-grid slds-wrap slds-gutters">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+            <lightning-tile label="Pending Events" value={syncStats.pendingEvents} type="media">
+              <lightning-icon icon-name="utility:clock" alternative-text="Pending"></lightning-icon>
+            </lightning-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+            <lightning-tile label="Applied Today" value={syncStats.appliedToday} type="media">
+              <lightning-icon icon-name="utility:check" alternative-text="Applied"></lightning-icon>
+            </lightning-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+            <lightning-tile label="Open Conflicts" value={syncStats.conflictsOpen} type="media">
+              <lightning-icon icon-name="utility:warning" alternative-text="Conflicts"></lightning-icon>
+            </lightning-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-4">
+            <lightning-tile label="Errors Today" value={syncStats.errorsToday} type="media">
+              <lightning-icon icon-name="utility:error" alternative-text="Errors"></lightning-icon>
+            </lightning-tile>
+          </div>
+        </div>
+        <div class="slds-var-m-top_medium">
+          <p class="slds-text-body_small">
+            Last sync:
+            <lightning-formatted-date-time
+              value={syncStats.lastSyncRun}
+              year="numeric"
+              month="short"
+              day="2-digit"
+              hour="2-digit"
+              minute="2-digit">
+            </lightning-formatted-date-time>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="slds-var-m-bottom_large">
+        <lightning-button
+          variant="brand"
+          label="Trigger Sync Now"
+          icon-name="utility:play"
+          onclick={handleTriggerSync}
+          disabled={isTriggering}>
+        </lightning-button>
+        <lightning-button
+          label="Refresh Stats"
+          icon-name="utility:refresh"
+          onclick={handleRefresh}
+          class="slds-var-m-left_small">
+        </lightning-button>
+      </div>
+
+      <!-- Pending Conflicts Section -->
+      <div class="slds-box slds-var-m-bottom_large">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_medium">
+          Pending Conflicts ({conflictCount})
+        </h3>
+
+        <template if:true={hasPendingConflicts}>
+          <div class="slds-scrollable_x">
+            <table class="slds-table slds-table_striped slds-table_bordered">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col"><div class="slds-truncate">Object</div></th>
+                  <th scope="col"><div class="slds-truncate">Record ID</div></th>
+                  <th scope="col"><div class="slds-truncate">Field</div></th>
+                  <th scope="col"><div class="slds-truncate">Org A Value</div></th>
+                  <th scope="col"><div class="slds-truncate">Org B Value</div></th>
+                  <th scope="col"><div class="slds-truncate">Snapshot</div></th>
+                  <th scope="col"><div class="slds-truncate">Action</div></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={pendingConflicts} for:item="conflict">
+                  <tr key={conflict.auditLogId} class="slds-hint-parent">
+                    <td><div class="slds-truncate">{conflict.objectApiName}</div></td>
+                    <td><div class="slds-truncate slds-text-link">{conflict.recordId}</div></td>
+                    <td><div class="slds-truncate">{conflict.fieldName}</div></td>
+                    <td>
+                      <div class="slds-truncate slds-text-body_small">
+                        {conflict.orgAValue}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="slds-truncate slds-text-body_small">
+                        {conflict.orgBValue}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="slds-truncate slds-text-body_small slds-text-color_weak">
+                        {conflict.snapshotValue}
+                      </div>
+                    </td>
+                    <td>
+                      <lightning-button-menu
+                        alternative-text="Actions"
+                        menu-alignment="right">
+                        <lightning-menu-item
+                          label="Accept Org A"
+                          value="OrgA"
+                          onselect={handleResolveConflict}
+                          data-conflict-id={conflict.auditLogId}>
+                        </lightning-menu-item>
+                        <lightning-menu-item
+                          label="Accept Org B"
+                          value="OrgB"
+                          onselect={handleResolveConflict}
+                          data-conflict-id={conflict.auditLogId}>
+                        </lightning-menu-item>
+                        <lightning-menu-divider></lightning-menu-divider>
+                        <lightning-menu-item
+                          label="View Details"
+                          value="Details"
+                          onselect={handleViewDetails}
+                          data-conflict-id={conflict.auditLogId}>
+                        </lightning-menu-item>
+                      </lightning-button-menu>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <template if:false={hasPendingConflicts}>
+          <div class="slds-text-align_center slds-var-m_vertical_medium">
+            <p class="slds-text-body_regular">No pending conflicts - everything is in sync!</p>
+            <lightning-icon
+              icon-name="utility:success"
+              alternative-text="No conflicts"
+              class="slds-icon-text-success">
+            </lightning-icon>
+          </div>
+        </template>
+      </div>
+
+      <!-- Recent Audit Log Section -->
+      <div class="slds-box">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_medium">Recent Sync Activity</h3>
+
+        <template if:true={hasAuditLogs}>
+          <div class="slds-scrollable_x">
+            <table class="slds-table slds-table_striped slds-table_bordered slds-table_resizable-cols">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col"><div class="slds-truncate">Object</div></th>
+                  <th scope="col"><div class="slds-truncate">Record ID</div></th>
+                  <th scope="col"><div class="slds-truncate">Field</div></th>
+                  <th scope="col"><div class="slds-truncate">Strategy</div></th>
+                  <th scope="col"><div class="slds-truncate">Outcome</div></th>
+                  <th scope="col"><div class="slds-truncate">Resolved Value</div></th>
+                  <th scope="col"><div class="slds-truncate">Synced At</div></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={auditLogs} for:item="log">
+                  <tr key={log.Id}>
+                    <td><div class="slds-truncate">{log.ObjectApiName__c}</div></td>
+                    <td><div class="slds-truncate slds-text-link">{log.RecordId__c}</div></td>
+                    <td><div class="slds-truncate">{log.FieldName__c}</div></td>
+                    <td>
+                      <lightning-badge label={log.Strategy__c}></lightning-badge>
+                    </td>
+                    <td>
+                      <lightning-badge label={log.Outcome__c}></lightning-badge>
+                    </td>
+                    <td><div class="slds-truncate slds-text-body_small">{log.ResolvedValue__c}</div></td>
+                    <td>
+                      <lightning-formatted-date-time
+                        value={log.SyncedAt__c}
+                        year="numeric"
+                        month="short"
+                        day="2-digit"
+                        hour="2-digit"
+                        minute="2-digit">
+                      </lightning-formatted-date-time>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <template if:false={hasAuditLogs}>
+          <p class="slds-text-body_regular slds-text-align_center">No sync activity yet</p>
+        </template>
+      </div>
+    </div>
+  </lightning-card>
+
+  <!-- Toast Messages -->
+  <lightning-toast></lightning-toast>
+
+  <!-- Loading Spinner -->
+  <template if:true={isLoading}>
+    <div class="slds-spinner_container">
+      <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </div>
+  </template>
+</template>
