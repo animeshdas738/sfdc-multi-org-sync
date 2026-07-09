@@ -1,8 +1,115 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Apex Classes -->
     <types>
-        <members>*</members>
+        <members>MultiOrgSyncTest</members>
+        <members>SyncApplyEngine</members>
+        <members>SyncAuditTrailWriter</members>
+        <members>SyncConflictResolver</members>
+        <members>SyncConstants</members>
+        <members>SyncDashboardController</members>
+        <members>SyncDeduplicator</members>
+        <members>SyncEventCaptureHandler</members>
+        <members>SyncOrchestratorBatch</members>
+        <members>SyncSnapshotDiffer</members>
         <name>ApexClass</name>
     </types>
+
+    <!-- Custom Objects -->
+    <types>
+        <members>SyncAuditLog__c</members>
+        <members>SyncEvent__c</members>
+        <members>SyncedRecordSnapshot__c</members>
+        <name>CustomObject</name>
+    </types>
+
+    <!-- Custom Fields (31 total) -->
+    <types>
+        <!-- SyncAuditLog__c Fields (16) -->
+        <members>SyncAuditLog__c.ApplyError__c</members>
+        <members>SyncAuditLog__c.ApplyStatus__c</members>
+        <members>SyncAuditLog__c.FieldName__c</members>
+        <members>SyncAuditLog__c.ManualResolutionAt__c</members>
+        <members>SyncAuditLog__c.ManualResolutionBy__c</members>
+        <members>SyncAuditLog__c.ObjectApiName__c</members>
+        <members>SyncAuditLog__c.OrgAValue__c</members>
+        <members>SyncAuditLog__c.OrgBValue__c</members>
+        <members>SyncAuditLog__c.Outcome__c</members>
+        <members>SyncAuditLog__c.RecordId__c</members>
+        <members>SyncAuditLog__c.ResolvedValue__c</members>
+        <members>SyncAuditLog__c.SnapshotValue__c</members>
+        <members>SyncAuditLog__c.SourceOrg__c</members>
+        <members>SyncAuditLog__c.Strategy__c</members>
+        <members>SyncAuditLog__c.SyncedAt__c</members>
+        <members>SyncAuditLog__c.TargetOrg__c</members>
+        <!-- SyncEvent__c Fields (10) -->
+        <members>SyncEvent__c.ChangedFields__c</members>
+        <members>SyncEvent__c.ChangeType__c</members>
+        <members>SyncEvent__c.CommitNumber__c</members>
+        <members>SyncEvent__c.CommitTimestamp__c</members>
+        <members>SyncEvent__c.Notes__c</members>
+        <members>SyncEvent__c.ObjectApiName__c</members>
+        <members>SyncEvent__c.PayloadJSON__c</members>
+        <members>SyncEvent__c.RecordId__c</members>
+        <members>SyncEvent__c.SourceOrg__c</members>
+        <members>SyncEvent__c.Status__c</members>
+        <!-- SyncedRecordSnapshot__c Fields (5) -->
+        <members>SyncedRecordSnapshot__c.LastSyncedAt__c</members>
+        <members>SyncedRecordSnapshot__c.ObjectApiName__c</members>
+        <members>SyncedRecordSnapshot__c.RecordId__c</members>
+        <members>SyncedRecordSnapshot__c.SnapshotJSON__c</members>
+        <members>SyncedRecordSnapshot__c.SnapshotVersion__c</members>
+        <name>CustomField</name>
+    </types>
+
+    <!-- Lightning Web Components -->
+    <types>
+        <members>syncDashboard</members>
+        <name>LightningComponentBundle</name>
+    </types>
+
+    <!-- Custom Metadata Types -->
+    <!--<types>
+        <members>SyncFieldPriorityConfig__mdt</members>
+        <name>CustomMetadata</name>
+    </types>-->
+
+    <!-- Applications -->
+    <types>
+        <members>Multi_Org_Sync</members>
+        <name>CustomApplication</name>
+    </types>
+
+    <!-- Flexi Pages (Lightning Pages) -->
+    <types>
+        <members>Multi_Org_Sync_UtilityBar</members>
+        <members>Sync_Dashboard</members>
+        <name>FlexiPage</name>
+    </types>
+
+    <!-- Page Layouts -->
+    <types>
+        <members>SyncAuditLog__c-Sync Audit Log Layout</members>
+        <members>SyncEvent__c-Sync Event Layout</members>
+        <members>SyncedRecordSnapshot__c-Synced Record Snapshot Layout</members>
+        <name>Layout</name>
+    </types>
+
+    <!-- Permission Sets -->
+    <types>
+        <members>Multi_Org_Sync_Access</members>
+        <name>PermissionSet</name>
+    </types>
+
+    <!-- Custom Tabs -->
+    <types>
+        <members>Sync_Dashboard</members>
+        <members>SyncAuditLog__c</members>
+        <members>SyncEvent__c</members>
+        <members>SyncedRecordSnapshot__c</members>
+        <name>CustomTab</name>
+    </types>
+
+    <!-- API Version -->
     <version>67.0</version>
 </Package>
